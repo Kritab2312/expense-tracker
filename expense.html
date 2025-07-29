@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #e0f7fa, #fce4ec);
+      color: #333;
+    }
+
+    header {
+      background: #f4f4f4;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .dashboard {
+      flex: 2;
+      margin-right: 20px;
+    }
+
+    .dashboard h2 {
+      font-size: 28px;
+    }
+
+    .balance-card {
+      background: linear-gradient(135deg, #5f2c82, #49a09d);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .summary {
+      display: flex;
+      gap: 20px;
+    }
+
+    .summary-card {
+      flex: 1;
+      padding: 15px;
+      border-radius: 10px;
+      background: #e0f2f1;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .summary-card.expense {
+      background: #ffebee;
+    }
+
+    .side-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .box h3 {
+      margin-bottom: 10px;
+    }
+
+    .box input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      background: #6a1b9a;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #4a148c;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 2px solid #333;
+      color: #333;
+      padding: 10px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    .expense-list {
+      margin-top: 40px;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      background: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .expense-item .right span,
+    .expense-item .left p {
+      display: block;
+    }
+
+    .expense-item .btn-delete {
+      background: #f44336;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    .expense-item .btn-edit {
+      background: #5c6bc0;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Expense Tracker</h1>
+  </header>
+
+  <div class="container">
+    <div class="top-row">
+      <div class="dashboard">
+        <h2>Dashboard</h2>
+        <p>Hello! Kritab, Welcome Back.</p>
+        <div class="balance-card">
+          <h3>Your Balance</h3>
+          <h1 id="balance">Rs 00,000.00</h1>
+        </div>
+        <div class="summary">
+          <div class="summary-card income">
+            <p>Current Amount</p>
+            <h3 id="income">Rs 00,000</h3>
+          </div>
+          <div class="summary-card expense">
+            <p>Expense</p>
+            <h3 id="expense">Rs 00,000</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="box">
+          <h3>Budget</h3>
+          <input type="number" id="budget-input" placeholder="Enter your budget..">
+          <button class="btn" onclick="setBudget()">Add Budget</button>
+        </div>
+        <div class="box">
+          <h3>Add Expense</h3>
+          <input type="text" id="expense-title" placeholder="Enter your expense title..">
+          <input type="text" id="expense-desc" placeholder="Enter your expense Desc..">
+          <input type="number" id="expense-amount" placeholder="Enter your expense..">
+          <input type="date" id="expense-date">
+          <button class="btn" onclick="addExpense()">Add Expense</button>
+        </div>
+        <button class="reset-btn" onclick="resetAll()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let balance = 0;
+    let income = 0;
+    let expense = 0;
+
+    function setBudget() {
+      const budgetInput = document.getElementById('budget-input');
+      income = parseFloat(budgetInput.value) || 0;
+      balance = income - expense;
+      updateDisplay();
+      budgetInput.value = '';
+    }
+
+    function addExpense() {
+      const title = document.getElementById('expense-title').value;
+      const desc = document.getElementById('expense-desc').value;
+      const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+      const date = document.getElementById('expense-date').value;
+
+      if (!title || !amount || !date) return;
+
+      expense += amount;
+      balance = income - expense;
+
+      const item = document.createElement('div');
+      item.classList.add('expense-item');
+      item.innerHTML = `
+        <div class="left">
+          <strong>${title}</strong>
+          <p>${desc}</p>
+        </div>
+        <div class="right">
+          <span>${amount}</span>
+          <span>${date}</span>
+          <button class="btn-edit">✎</button>
+          <button class="btn-delete" onclick="deleteExpense(this, ${amount})">×</button>
+        </div>
+      `;
+      document.getElementById('expense-items').appendChild(item);
+      updateDisplay();
+
+      document.getElementById('expense-title').value = '';
+      document.getElementById('expense-desc').value = '';
+      document.getElementById('expense-amount').value = '';
+      document.getElementById('expense-date').value = '';
+    }
+
+    function deleteExpense(button, amount) {
+      expense -= amount;
+      balance = income - expense;
+      button.closest('.expense-item').remove();
+      updateDisplay();
+    }
+
+    function resetAll() {
+      income = 0;
+      expense = 0;
+      balance = 0;
+      document.getElementById('expense-items').innerHTML = '';
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById('balance').textContent = `Rs ${balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+      document.getElementById('income').textContent = `Rs ${income.toLocaleString('en-IN')}`;
+      document.getElementById('expense').textContent = `Rs ${expense.toLocaleString('en-IN')}`;
+    }
+  </script>
+</body>
+</html>
